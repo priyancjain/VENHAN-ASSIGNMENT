@@ -41,8 +41,10 @@ class Book:
                            (new_title, new_author, new_genre, new_quantity, isbn))
             conn.commit()
             log_info(f"Book updated: {isbn}")
+            print(f"Book '{isbn}' updated successfully!")
         else:
             log_error(f"Error: Book with ISBN {isbn} not found.")
+            print(f"Error: Book with ISBN {isbn} not found. Please enter correct information.")
         conn.close()
 
     @staticmethod
@@ -50,8 +52,13 @@ class Book:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('DELETE FROM Books WHERE isbn = ?', (isbn,))
-        conn.commit()
-        log_info(f"Book removed: {isbn}")
+        if cursor.rowcount > 0:
+            conn.commit()
+            log_info(f"Book removed: {isbn}")
+            print(f"Book '{isbn}' removed successfully!")
+        else:
+            log_error(f"Error: Book with ISBN {isbn} not found.")
+            print(f"Error: Book with ISBN {isbn} not found. Please enter correct information.")
         conn.close()
 
     @staticmethod
@@ -75,8 +82,12 @@ class Book:
         results = cursor.fetchall()
         conn.close()
 
-        return results
-
+        if results:
+            return results
+        else:
+            print("No books found. Please enter correct information.")
+            return []
+        
     @staticmethod
     def check_availability(isbn):
         conn = get_db_connection()
@@ -84,8 +95,12 @@ class Book:
         cursor.execute('SELECT quantity FROM Books WHERE isbn = ?', (isbn,))
         result = cursor.fetchone()
         conn.close()
-        return result[0] if result else None
-
+        
+        if result:
+            return result[0]  # Return the quantity available
+        else:
+            print(f"Book with ISBN {isbn} not found. Please enter correct information.")
+            return None
 
 # Borrower class to manage borrower details
 class Borrower:
@@ -123,8 +138,10 @@ class Borrower:
                            (new_name, new_contact, membership_id))
             conn.commit()
             log_info(f"Borrower updated: {membership_id}")
+            print(f"Borrower '{membership_id}' updated successfully!")
         else:
             log_error(f"Error: Borrower with ID {membership_id} not found.")
+            print(f"Error: Borrower with ID {membership_id} not found. Please enter correct information.")
         conn.close()
 
     @staticmethod
@@ -132,10 +149,14 @@ class Borrower:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('DELETE FROM Borrowers WHERE membership_id = ?', (membership_id,))
-        conn.commit()
-        log_info(f"Borrower removed: {membership_id}")
+        if cursor.rowcount > 0:
+            conn.commit()
+            log_info(f"Borrower removed: {membership_id}")
+            print(f"Borrower '{membership_id}' removed successfully!")
+        else:
+            log_error(f"Error: Borrower with ID {membership_id} not found.")
+            print(f"Error: Borrower with ID {membership_id} not found. Please enter correct information.")
         conn.close()
-
 
 # Borrowing management class
 class Borrowing:
